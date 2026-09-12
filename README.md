@@ -10,8 +10,8 @@ Personal dotfiles for a terminal-centric development setup: **tmux**, **Vim**, a
 | `tmux.conf`     | tmux configuration (targets tmux 3.0+) |
 | `vimrc`         | Vim configuration, managed with Vundle |
 | `zshrc`         | zsh configuration, loads oh-my-zsh |
-| `dotfiles.zsh-theme` | Custom oh-my-zsh prompt theme (folder, git branch, time) |
-| `setup.sh`      | Backs up existing dotfiles, installs zsh + oh-my-zsh, symlinks these into `$HOME`, installs plugin managers |
+| `dotfiles.zsh-theme` | Custom oh-my-zsh prompt theme (user@host, time, path, git branch) |
+| `setup.sh`      | Backs up existing dotfiles, installs zsh + oh-my-zsh + zsh-autosuggestions/zsh-syntax-highlighting, symlinks these into `$HOME`, installs plugin managers |
 
 ## Install
 
@@ -25,13 +25,15 @@ cd ~/dotfiles
 
 1. Move any existing `~/.tmux.conf` / `~/.vimrc` / `~/.zshrc` aside to `*_bak`.
 2. Install `zsh` via the detected package manager (`pacman`/`apt`/`dnf`/`brew`) if missing.
-3. Install [oh-my-zsh](https://github.com/ohmyzsh/ohmyzsh) into `~/.oh-my-zsh` (unattended;
+3. Install `zsh-autosuggestions` and `zsh-syntax-highlighting` via the same package
+   manager.
+4. Install [oh-my-zsh](https://github.com/ohmyzsh/ohmyzsh) into `~/.oh-my-zsh` (unattended;
    keeps our `zshrc`, does not `chsh` or launch a shell).
-4. Symlink `tmux.conf` → `~/.tmux.conf`, `vimrc` → `~/.vimrc`, `zshrc` → `~/.zshrc`,
+5. Symlink `tmux.conf` → `~/.tmux.conf`, `vimrc` → `~/.vimrc`, `zshrc` → `~/.zshrc`,
    and `dotfiles.zsh-theme` → `~/.oh-my-zsh/custom/themes/dotfiles.zsh-theme`.
-5. Clone [Vundle](https://github.com/VundleVim/Vundle.vim) into `~/.vim/bundle/Vundle.vim`.
-6. Clone [tpm](https://github.com/tmux-plugins/tpm) into `~/.tmux/plugins/tpm`.
-7. Set `zsh` as the default login shell (`chsh`) if it isn't already.
+6. Clone [Vundle](https://github.com/VundleVim/Vundle.vim) into `~/.vim/bundle/Vundle.vim`.
+7. Clone [tpm](https://github.com/tmux-plugins/tpm) into `~/.tmux/plugins/tpm`.
+8. Set `zsh` as the default login shell (`chsh`) if it isn't already.
 
 ### Finish setup
 
@@ -70,8 +72,14 @@ cd ~/dotfiles
 ## zshrc highlights
 
 - Loads oh-my-zsh with the custom `dotfiles` theme (`dotfiles.zsh-theme`, symlinked
-  into `~/.oh-my-zsh/custom/themes/`) and the `git` / `tmux` plugins. The prompt
-  shows the current folder, git branch, and 24h time with seconds.
+  into `~/.oh-my-zsh/custom/themes/`) and the `git` / `tmux` / `history-substring-search`
+  plugins. The prompt shows `user@host`, 24h time with seconds, the full path, and
+  the git branch, e.g. `diver@legion-edeavour [17:55:00] [~/development/dotfiles] [master]`.
+- Up/down arrows and vi `k`/`j` search history by the currently typed prefix
+  (`history-substring-search`).
+- `zsh-autosuggestions` and `zsh-syntax-highlighting`, installed via the system
+  package manager by `setup.sh`, are sourced directly from their package install
+  path (not via oh-my-zsh's custom plugin mechanism).
 - 10k-line shared history with de-duplication.
 - `EDITOR`/`VISUAL` set to `vim`.
 - Sources `~/.zshrc.local` for machine-specific settings if it exists.
