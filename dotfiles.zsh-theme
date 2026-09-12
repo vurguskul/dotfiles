@@ -2,7 +2,7 @@
 # Two-line prompt: user@host (bold), 24h time with seconds, full path (white),
 # and git branch (if any) on top; a short "-> %" prompt below to type commands.
 # e.g.
-# diver@legion-edeavour [17:55:00] [~/development/dotfiles] [master]
+# user@hostname [17:55:00] [~/development/dotfiles] [master]
 # -> %
 
 ZSH_THEME_GIT_PROMPT_PREFIX=" %{$fg[yellow]%}["

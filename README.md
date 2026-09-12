@@ -77,7 +77,7 @@ cd ~/dotfiles
   (white), and the git branch on top, with a short `-> %` prompt below to type
   commands, e.g.:
   ```
-  diver@legion-edeavour [17:55:00] [~/development/dotfiles] [master]
+  user@hostname [17:55:00] [~/development/dotfiles] [master]
   -> %
   ```
 - Up/down arrows and vi `k`/`j` search history by the currently typed prefix
