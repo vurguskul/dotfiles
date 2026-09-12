@@ -73,8 +73,13 @@ cd ~/dotfiles
 
 - Loads oh-my-zsh with the custom `dotfiles` theme (`dotfiles.zsh-theme`, symlinked
   into `~/.oh-my-zsh/custom/themes/`) and the `git` / `tmux` / `history-substring-search`
-  plugins. The prompt shows `user@host`, 24h time with seconds, the full path, and
-  the git branch, e.g. `diver@legion-edeavour [17:55:00] [~/development/dotfiles] [master]`.
+  plugins. Two-line prompt: `user@host` (bold), 24h time with seconds, the full path
+  (white), and the git branch on top, with a short `-> %` prompt below to type
+  commands, e.g.:
+  ```
+  diver@legion-edeavour [17:55:00] [~/development/dotfiles] [master]
+  -> %
+  ```
 - Up/down arrows and vi `k`/`j` search history by the currently typed prefix
   (`history-substring-search`).
 - `zsh-autosuggestions` and `zsh-syntax-highlighting`, installed via the system
