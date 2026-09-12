@@ -26,6 +26,19 @@ else
     echo "zsh is already installed."
 fi
 
+echo "Installing zsh-autosuggestions and zsh-syntax-highlighting..."
+if command -v pacman >/dev/null 2>&1; then
+    sudo pacman -S --needed --noconfirm zsh-autosuggestions zsh-syntax-highlighting
+elif command -v apt-get >/dev/null 2>&1; then
+    sudo apt-get update && sudo apt-get install -y zsh-autosuggestions zsh-syntax-highlighting
+elif command -v dnf >/dev/null 2>&1; then
+    sudo dnf install -y zsh-autosuggestions zsh-syntax-highlighting
+elif command -v brew >/dev/null 2>&1; then
+    brew install zsh-autosuggestions zsh-syntax-highlighting
+else
+    echo "No supported package manager found. Please install zsh-autosuggestions and zsh-syntax-highlighting manually."
+fi
+
 echo "Installing oh-my-zsh..."
 if [ ! -d $HOME/.oh-my-zsh ]; then
     RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
