@@ -39,6 +39,19 @@ else
     echo "No supported package manager found. Please install zsh-autosuggestions and zsh-syntax-highlighting manually."
 fi
 
+echo "Installing clipboard tools (tmux copy -> system clipboard)..."
+if command -v pacman >/dev/null 2>&1; then
+    sudo pacman -S --needed --noconfirm wl-clipboard xclip
+elif command -v apt-get >/dev/null 2>&1; then
+    sudo apt-get update && sudo apt-get install -y wl-clipboard xclip
+elif command -v dnf >/dev/null 2>&1; then
+    sudo dnf install -y wl-clipboard xclip
+elif command -v pbcopy >/dev/null 2>&1; then
+    echo "macOS pbcopy is built in, nothing to install."
+else
+    echo "No supported package manager found. Please install wl-clipboard or xclip manually."
+fi
+
 echo "Installing oh-my-zsh..."
 if [ ! -d $HOME/.oh-my-zsh ]; then
     RUNZSH=no CHSH=no KEEP_ZSHRC=yes \

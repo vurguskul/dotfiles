@@ -11,7 +11,7 @@ Personal dotfiles for a terminal-centric development setup: **tmux**, **Vim**, a
 | `vimrc`         | Vim configuration, managed with Vundle |
 | `zshrc`         | zsh configuration, loads oh-my-zsh |
 | `dotfiles.zsh-theme` | Custom oh-my-zsh prompt theme (user@host, time, path, git branch) |
-| `setup.sh`      | Backs up existing dotfiles, installs zsh + oh-my-zsh + zsh-autosuggestions/zsh-syntax-highlighting, symlinks these into `$HOME`, installs plugin managers |
+| `setup.sh`      | Backs up existing dotfiles, installs zsh + oh-my-zsh + zsh-autosuggestions/zsh-syntax-highlighting + clipboard tools, symlinks these into `$HOME`, installs plugin managers |
 
 ## Install
 
@@ -27,13 +27,15 @@ cd ~/dotfiles
 2. Install `zsh` via the detected package manager (`pacman`/`apt`/`dnf`/`brew`) if missing.
 3. Install `zsh-autosuggestions` and `zsh-syntax-highlighting` via the same package
    manager.
-4. Install [oh-my-zsh](https://github.com/ohmyzsh/ohmyzsh) into `~/.oh-my-zsh` (unattended;
+4. Install `wl-clipboard` and `xclip` so tmux copies reach the system clipboard
+   (on macOS the built-in `pbcopy` is used instead).
+5. Install [oh-my-zsh](https://github.com/ohmyzsh/ohmyzsh) into `~/.oh-my-zsh` (unattended;
    keeps our `zshrc`, does not `chsh` or launch a shell).
-5. Symlink `tmux.conf` → `~/.tmux.conf`, `vimrc` → `~/.vimrc`, `zshrc` → `~/.zshrc`,
+6. Symlink `tmux.conf` → `~/.tmux.conf`, `vimrc` → `~/.vimrc`, `zshrc` → `~/.zshrc`,
    and `dotfiles.zsh-theme` → `~/.oh-my-zsh/custom/themes/dotfiles.zsh-theme`.
-6. Clone [Vundle](https://github.com/VundleVim/Vundle.vim) into `~/.vim/bundle/Vundle.vim`.
-7. Clone [tpm](https://github.com/tmux-plugins/tpm) into `~/.tmux/plugins/tpm`.
-8. Set `zsh` as the default login shell (`chsh`) if it isn't already.
+7. Clone [Vundle](https://github.com/VundleVim/Vundle.vim) into `~/.vim/bundle/Vundle.vim`.
+8. Clone [tpm](https://github.com/tmux-plugins/tpm) into `~/.tmux/plugins/tpm`.
+9. Set `zsh` as the default login shell (`chsh`) if it isn't already.
 
 ### Finish setup
 
@@ -52,6 +54,14 @@ cd ~/dotfiles
 - `Alt + arrows` to move between panes, `Ctrl+Alt + Left/Right` to switch windows,
   `Alt+Shift + arrows` to resize.
 - Mouse mode on, `vi` copy/status keys, 10k-line history.
+- **Copy to the system clipboard.** In copy mode (`prefix + [`): `v` starts a
+  selection, `C-v` toggles block selection, `y` (or `Enter`) copies and exits,
+  `Y` copies without clearing the selection. Releasing a mouse drag copies too.
+  `prefix + C-v` pastes the system clipboard into the pane.
+  tmux picks a clipboard backend at startup (`wl-copy` on Wayland, else `xclip` /
+  `xsel` / `pbcopy`) and sets it as `copy-command`, which is what the default copy
+  bindings pipe to. `set-clipboard on` additionally emits OSC 52, so copying still
+  works over SSH or with no clipboard binary installed, given terminal support.
 - `prefix + r` reloads the config.
 - Plugins: `tmux-sensible`, `tmux-resurrect`, `tmux-continuum` (auto restore of
   sessions, panes, and shell history), `tmux-colors-solarized` (dark).
