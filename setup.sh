@@ -69,8 +69,25 @@ mkdir -p ~/.oh-my-zsh/custom/themes
 ln -sfn "$DIR/dotfiles.zsh-theme" ~/.oh-my-zsh/custom/themes/dotfiles.zsh-theme
 
 echo "Installing plugin managers..."
-git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+if [ ! -d "$HOME/.vim/bundle/Vundle.vim" ]; then
+    git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+else
+    echo "Vundle is already installed."
+fi
+if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
+    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+else
+    echo "tpm is already installed."
+fi
+
+# tpm only loads plugins that are already on disk; cloning tpm alone leaves
+# tmux-resurrect & co. missing and silently inactive.
+echo "Installing tmux plugins..."
+~/.tmux/plugins/tpm/bin/install_plugins
+if tmux has-session 2>/dev/null; then
+    echo "Reloading tmux config in the running server..."
+    tmux source-file ~/.tmux.conf
+fi
 
 if command -v zsh >/dev/null 2>&1 && [ "$SHELL" != "$(command -v zsh)" ]; then
     echo "Setting zsh as the default shell..."

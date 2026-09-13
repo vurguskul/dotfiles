@@ -34,15 +34,18 @@ cd ~/dotfiles
 6. Symlink `tmux.conf` → `~/.tmux.conf`, `vimrc` → `~/.vimrc`, `zshrc` → `~/.zshrc`,
    and `dotfiles.zsh-theme` → `~/.oh-my-zsh/custom/themes/dotfiles.zsh-theme`.
 7. Clone [Vundle](https://github.com/VundleVim/Vundle.vim) into `~/.vim/bundle/Vundle.vim`.
-8. Clone [tpm](https://github.com/tmux-plugins/tpm) into `~/.tmux/plugins/tpm`.
+8. Clone [tpm](https://github.com/tmux-plugins/tpm) into `~/.tmux/plugins/tpm` and
+   install the tmux plugins listed in `tmux.conf`, reloading a running tmux server.
 9. Set `zsh` as the default login shell (`chsh`) if it isn't already.
 
 ### Finish setup
 
 - **Vim plugins:** open Vim and run `:PluginInstall`. `YouCompleteMe` needs a
   separate compile step (`~/.vim/bundle/YouCompleteMe/install.py`).
-- **tmux plugins:** start tmux and press `prefix + I` (prefix is `C-a`) to have
-  tpm fetch the plugins.
+- **tmux plugins:** `setup.sh` installs these already. If you edit the `@plugin`
+  list later, press `prefix + I` (prefix is `C-a`) inside tmux, or run
+  `~/.tmux/plugins/tpm/bin/install_plugins`. tpm only loads plugins that are
+  already on disk, so a missing clone leaves them silently inactive.
 - **zsh:** log out and back in for the shell change to take effect. Put machine-local
   tweaks in `~/.zshrc.local` (sourced if present, not tracked here).
 
