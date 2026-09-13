@@ -11,6 +11,7 @@ Personal dotfiles for a terminal-centric development setup: **tmux**, **Vim**, a
 | `vimrc`         | Vim configuration, managed with Vundle |
 | `zshrc`         | zsh configuration, loads oh-my-zsh |
 | `dotfiles.zsh-theme` | Custom oh-my-zsh prompt theme (user@host, time, path, git branch) |
+| `clipboard-copy` | Helper tmux pipes copied text to; picks a clipboard backend and drops empty input |
 | `setup.sh`      | Backs up existing dotfiles, installs zsh + oh-my-zsh + zsh-autosuggestions/zsh-syntax-highlighting + clipboard tools, symlinks these into `$HOME`, installs plugin managers |
 
 ## Install
@@ -32,7 +33,8 @@ cd ~/dotfiles
 5. Install [oh-my-zsh](https://github.com/ohmyzsh/ohmyzsh) into `~/.oh-my-zsh` (unattended;
    keeps our `zshrc`, does not `chsh` or launch a shell).
 6. Symlink `tmux.conf` → `~/.tmux.conf`, `vimrc` → `~/.vimrc`, `zshrc` → `~/.zshrc`,
-   and `dotfiles.zsh-theme` → `~/.oh-my-zsh/custom/themes/dotfiles.zsh-theme`.
+   `clipboard-copy` → `~/.local/bin/clipboard-copy`, and `dotfiles.zsh-theme` →
+   `~/.oh-my-zsh/custom/themes/dotfiles.zsh-theme`.
 7. Clone [Vundle](https://github.com/VundleVim/Vundle.vim) into `~/.vim/bundle/Vundle.vim`.
 8. Clone [tpm](https://github.com/tmux-plugins/tpm) into `~/.tmux/plugins/tpm` and
    install the tmux plugins listed in `tmux.conf`, reloading a running tmux server.
@@ -61,10 +63,17 @@ cd ~/dotfiles
   selection, `C-v` toggles block selection, `y` (or `Enter`) copies and exits,
   `Y` copies without clearing the selection. Releasing a mouse drag copies too.
   `prefix + C-v` pastes the system clipboard into the pane.
-  tmux picks a clipboard backend at startup (`wl-copy` on Wayland, else `xclip` /
-  `xsel` / `pbcopy`) and sets it as `copy-command`, which is what the default copy
-  bindings pipe to. `set-clipboard on` additionally emits OSC 52, so copying still
-  works over SSH or with no clipboard binary installed, given terminal support.
+  tmux pipes every copy to `clipboard-copy` (via `copy-command`), which picks a
+  backend at run time — `wl-copy` on Wayland, else `xclip` / `xsel` / `pbcopy`.
+  `set-clipboard on` additionally emits OSC 52, so copying still works over SSH or
+  with no clipboard binary installed, given terminal support.
+
+  `clipboard-copy` deliberately ignores empty input. tmux pipes an empty selection
+  whenever a copy key is pressed without one — pressing `Enter` to leave copy mode,
+  a stray drag, a double-click on blank space — and handing zero bytes to `wl-copy`
+  makes it claim the clipboard while offering only `application/x-zerosize`. Every
+  later paste then fails (`No compatible transfer format found` in GTK apps), so
+  without the guard those keystrokes silently wipe the clipboard.
 - `prefix + r` reloads the config.
 - Plugins: `tmux-sensible`, `tmux-resurrect`, `tmux-continuum` (auto restore of
   sessions, panes, and shell history), `tmux-colors-solarized` (dark).

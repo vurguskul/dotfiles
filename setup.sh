@@ -65,6 +65,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ln -sfn "$DIR/tmux.conf" ~/.tmux.conf
 ln -sfn "$DIR/vimrc" ~/.vimrc
 ln -sfn "$DIR/zshrc" ~/.zshrc
+mkdir -p ~/.local/bin
+ln -sfn "$DIR/clipboard-copy" ~/.local/bin/clipboard-copy
 mkdir -p ~/.oh-my-zsh/custom/themes
 ln -sfn "$DIR/dotfiles.zsh-theme" ~/.oh-my-zsh/custom/themes/dotfiles.zsh-theme
 

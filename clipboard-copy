@@ -1,0 +1,45 @@
+#!/bin/sh
+# Copy stdin to the system clipboard. Used as tmux's `copy-command`.
+#
+# Empty input is dropped on purpose. Handing zero bytes to wl-copy (or xclip)
+# does not leave the clipboard alone: the tool takes ownership and then offers
+# only application/x-zerosize, with no text/plain at all, so every later paste
+# fails with "No compatible transfer format found". tmux pipes an empty
+# selection whenever a copy key is pressed without one -- Enter to leave copy
+# mode, a stray drag, a double-click on blank space -- so without this guard
+# those keystrokes silently destroy whatever was on the clipboard.
+#
+# Backends are probed at run time rather than when tmux.conf is parsed, so a
+# tmux server started before the graphical session still copies correctly.
+
+# Buffer stdin. The X sentinel protects trailing newlines from being stripped
+# by the command substitution; it is removed again right after.
+payload=$(cat; printf X)
+payload=${payload%X}
+
+[ -n "$payload" ] || exit 0
+
+# wl-copy and xclip fork a daemon that keeps serving the selection after they
+# return, and it inherits this process's stdio from tmux's job. Detach it:
+# holding tmux's pipe open can hang whatever reads it, and the daemon dies of
+# SIGPIPE when tmux closes it, leaving the clipboard owned but unreadable.
+# setsid additionally survives tmux tearing down the job's process group.
+detach=""
+command -v setsid >/dev/null 2>&1 && detach=setsid
+
+copy_with() {
+    printf %s "$payload" | $detach "$@" >/dev/null 2>&1
+}
+
+if [ -n "$WAYLAND_DISPLAY" ] && command -v wl-copy >/dev/null 2>&1; then
+    copy_with wl-copy
+elif [ -n "$DISPLAY" ] && command -v xclip >/dev/null 2>&1; then
+    copy_with xclip -selection clipboard -in
+elif [ -n "$DISPLAY" ] && command -v xsel >/dev/null 2>&1; then
+    copy_with xsel --clipboard --input
+elif command -v pbcopy >/dev/null 2>&1; then
+    copy_with pbcopy
+else
+    # No clipboard tool: the tmux buffer and OSC 52 are still set by tmux.
+    exit 0
+fi
