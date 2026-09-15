@@ -115,6 +115,7 @@ cd ~/dotfiles
   | `Ctrl-R` | fuzzy history search | `fzf` |
   | `Ctrl-T` | fuzzy file picker into the command line | `fzf` |
   | `Alt-C` | fuzzy `cd` | `fzf` |
+  | `Ctrl-U` / `Ctrl-D` | half-page up / down inside any fzf picker | `fzf` |
   | `Esc Esc` | prefix the current line with `sudo` | `sudo` |
   | `Ctrl-O` | copy the current line to the clipboard | `copybuffer` |
   | `Ctrl-Z` | on an empty line, resume the last job | `fancy-ctrl-z` |
@@ -125,6 +126,13 @@ cd ~/dotfiles
   (`Alt` + arrows) are taken by `tmux.conf` for pane switching.
 - `fzf` uses `fd` for its file and directory walks when `fd` is installed, so it
   honours `.gitignore` and skips `.git`.
+- `FZF_DEFAULT_OPTS` binds `Ctrl-U` / `Ctrl-D` to fzf's `half-page-up` /
+  `half-page-down`, which the tool implements but ships unbound. This replaces
+  `Ctrl-D`'s default `delete-char/eof` and `Ctrl-U`'s `unix-line-discard` inside
+  the picker; `Ctrl-W` still deletes a word and `Esc` / `Ctrl-C` still abort.
+  Note the `Ctrl-R` history list is the one widget fzf does *not* draw with
+  `--reverse`, so it runs bottom-up and `Ctrl-U` is what walks back into older
+  entries - which is the vim direction anyway.
 - `zsh-autosuggestions` and `zsh-syntax-highlighting`, installed via the system
   package manager by `setup.sh`, are sourced directly from their package install
   path (not via oh-my-zsh's custom plugin mechanism). Suggestions fall back to

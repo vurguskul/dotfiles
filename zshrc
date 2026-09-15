@@ -45,6 +45,12 @@ if command -v fd >/dev/null 2>&1; then
     export FZF_ALT_C_COMMAND='fd --type d --hidden --exclude .git'
 fi
 
+# fzf has half-page-up / half-page-down actions but ships them unbound. Put them
+# on vim's keys, matching the vi copy mode in tmux.conf and vi keys in less.
+# This costs ctrl-d's default delete-char/eof and ctrl-u's unix-line-discard
+# inside the picker; ctrl-w still deletes a word and esc / ctrl-c still abort.
+export FZF_DEFAULT_OPTS="--bind ctrl-d:half-page-down,ctrl-u:half-page-up"
+
 # oh-my-zsh already turns on menu selection and case-insensitive matching; these
 # only add the headers saying which group a match came from.
 zstyle ':completion:*' group-name ''
