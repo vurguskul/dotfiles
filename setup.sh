@@ -39,6 +39,29 @@ else
     echo "No supported package manager found. Please install zsh-autosuggestions and zsh-syntax-highlighting manually."
 fi
 
+# Extra completion definitions for tools zsh does not ship completions for.
+# Not packaged everywhere, so a miss here must not fail the rest of the install.
+echo "Installing zsh-completions (optional)..."
+if command -v pacman >/dev/null 2>&1; then
+    sudo pacman -S --needed --noconfirm zsh-completions || echo "zsh-completions unavailable, skipping."
+elif command -v brew >/dev/null 2>&1; then
+    brew install zsh-completions || echo "zsh-completions unavailable, skipping."
+else
+    echo "No zsh-completions package for this platform, skipping."
+fi
+
+# The command-not-found plugin needs pkgfile's file database on Arch; without a
+# populated cache the plugin loads and silently does nothing.
+if command -v pacman >/dev/null 2>&1; then
+    echo "Installing pkgfile for command-not-found..."
+    sudo pacman -S --needed --noconfirm pkgfile
+    if [ -z "$(ls -A /var/cache/pkgfile 2>/dev/null)" ]; then
+        echo "Populating the pkgfile database (first run, this downloads a few MB)..."
+        sudo pkgfile --update
+    fi
+    sudo systemctl enable --now pkgfile-update.timer 2>/dev/null || true
+fi
+
 echo "Installing clipboard tools (tmux copy -> system clipboard)..."
 if command -v pacman >/dev/null 2>&1; then
     sudo pacman -S --needed --noconfirm wl-clipboard xclip

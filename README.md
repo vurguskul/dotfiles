@@ -28,17 +28,22 @@ cd ~/dotfiles
 2. Install `zsh` via the detected package manager (`pacman`/`apt`/`dnf`/`brew`) if missing.
 3. Install `zsh-autosuggestions` and `zsh-syntax-highlighting` via the same package
    manager.
-4. Install `wl-clipboard` and `xclip` so tmux copies reach the system clipboard
+4. Install `zsh-completions` where it is packaged (Arch, Homebrew). Optional — a
+   platform without it is logged and skipped rather than failing the run.
+5. On Arch, install `pkgfile` and populate its file database (and enable
+   `pkgfile-update.timer`), which the `command-not-found` plugin needs; without a
+   populated cache that plugin loads and silently does nothing.
+6. Install `wl-clipboard` and `xclip` so tmux copies reach the system clipboard
    (on macOS the built-in `pbcopy` is used instead).
-5. Install [oh-my-zsh](https://github.com/ohmyzsh/ohmyzsh) into `~/.oh-my-zsh` (unattended;
+7. Install [oh-my-zsh](https://github.com/ohmyzsh/ohmyzsh) into `~/.oh-my-zsh` (unattended;
    keeps our `zshrc`, does not `chsh` or launch a shell).
-6. Symlink `tmux.conf` → `~/.tmux.conf`, `vimrc` → `~/.vimrc`, `zshrc` → `~/.zshrc`,
+8. Symlink `tmux.conf` → `~/.tmux.conf`, `vimrc` → `~/.vimrc`, `zshrc` → `~/.zshrc`,
    `clipboard-copy` → `~/.local/bin/clipboard-copy`, and `dotfiles.zsh-theme` →
    `~/.oh-my-zsh/custom/themes/dotfiles.zsh-theme`.
-7. Clone [Vundle](https://github.com/VundleVim/Vundle.vim) into `~/.vim/bundle/Vundle.vim`.
-8. Clone [tpm](https://github.com/tmux-plugins/tpm) into `~/.tmux/plugins/tpm` and
-   install the tmux plugins listed in `tmux.conf`, reloading a running tmux server.
-9. Set `zsh` as the default login shell (`chsh`) if it isn't already.
+9. Clone [Vundle](https://github.com/VundleVim/Vundle.vim) into `~/.vim/bundle/Vundle.vim`.
+10. Clone [tpm](https://github.com/tmux-plugins/tpm) into `~/.tmux/plugins/tpm` and
+    install the tmux plugins listed in `tmux.conf`, reloading a running tmux server.
+11. Set `zsh` as the default login shell (`chsh`) if it isn't already.
 
 ### Finish setup
 
@@ -94,20 +99,41 @@ cd ~/dotfiles
 ## zshrc highlights
 
 - Loads oh-my-zsh with the custom `dotfiles` theme (`dotfiles.zsh-theme`, symlinked
-  into `~/.oh-my-zsh/custom/themes/`) and the `git` / `tmux` / `history-substring-search`
-  plugins. Two-line prompt: `user@host` (bold), 24h time with seconds, the full path
-  (white), and the git branch on top, with a short `-> %` prompt below to type
-  commands, e.g.:
+  into `~/.oh-my-zsh/custom/themes/`). Two-line prompt: `user@host` (bold), 24h
+  time with seconds, the full path (white), and the git branch on top, with a
+  short `-> %` prompt below to type commands, e.g.:
   ```
   user@hostname [17:55:00] [~/development/dotfiles] [master]
   -> %
   ```
-- Up/down arrows and vi `k`/`j` search history by the currently typed prefix
+- Up/down arrows search history by the currently typed prefix
   (`history-substring-search`).
+- oh-my-zsh plugins and the keys they add:
+
+  | Key | What it does | Plugin |
+  |-----|--------------|--------|
+  | `Ctrl-R` | fuzzy history search | `fzf` |
+  | `Ctrl-T` | fuzzy file picker into the command line | `fzf` |
+  | `Alt-C` | fuzzy `cd` | `fzf` |
+  | `Esc Esc` | prefix the current line with `sudo` | `sudo` |
+  | `Ctrl-O` | copy the current line to the clipboard | `copybuffer` |
+  | `Ctrl-Z` | on an empty line, resume the last job | `fancy-ctrl-z` |
+
+  Plus `extract` (`x <archive>`, any format), `copypath` / `copyfile`,
+  `colored-man-pages`, `command-not-found`, `gh` completions, and `git` / `tmux`.
+  `dirhistory` is deliberately *not* enabled: all four of its bindings
+  (`Alt` + arrows) are taken by `tmux.conf` for pane switching.
+- `fzf` uses `fd` for its file and directory walks when `fd` is installed, so it
+  honours `.gitignore` and skips `.git`.
 - `zsh-autosuggestions` and `zsh-syntax-highlighting`, installed via the system
   package manager by `setup.sh`, are sourced directly from their package install
-  path (not via oh-my-zsh's custom plugin mechanism).
-- 10k-line shared history with de-duplication.
+  path (not via oh-my-zsh's custom plugin mechanism). Suggestions fall back to
+  completion when history has no match, and stop once the line passes 200
+  characters, which is long enough to be a paste rather than something typed.
+- 100k-line shared history with de-duplication.
+- `DISABLE_UNTRACKED_FILES_DIRTY` is set: the prompt runs `git status` on every
+  command, and scanning for untracked files is the slow half of that in a large
+  repo. The theme shows a single `✗` either way.
 - `EDITOR`/`VISUAL` set to `vim`.
 - Sources `~/.zshrc.local` for machine-specific settings if it exists.
 
