@@ -43,10 +43,12 @@ cd ~/dotfiles
    `clipboard-copy` → `~/.local/bin/clipboard-copy`, `dotfiles.zsh-theme` →
    `~/.oh-my-zsh/custom/themes/dotfiles.zsh-theme`, and `gtk4.css` →
    `~/.config/gtk-4.0/gtk.css`.
-9. Clone [Vundle](https://github.com/VundleVim/Vundle.vim) into `~/.vim/bundle/Vundle.vim`.
-10. Clone [tpm](https://github.com/tmux-plugins/tpm) into `~/.tmux/plugins/tpm` and
+9. Set the GNOME Console font to `Monospace 12` (the `KGX_FONT` variable in
+   `setup.sh`). Console has no config file — its settings are gsettings keys.
+10. Clone [Vundle](https://github.com/VundleVim/Vundle.vim) into `~/.vim/bundle/Vundle.vim`.
+11. Clone [tpm](https://github.com/tmux-plugins/tpm) into `~/.tmux/plugins/tpm` and
     install the tmux plugins listed in `tmux.conf`, reloading a running tmux server.
-11. Set `zsh` as the default login shell (`chsh`) if it isn't already.
+12. Set `zsh` as the default login shell (`chsh`) if it isn't already.
 
 ### Finish setup
 
@@ -184,7 +186,9 @@ cd ~/dotfiles
   desktop-wide and taking it away from every other application.
 - The main menu goes with the bar, and the Preferences window with it. Console's
   settings are `org.gnome.Console` gsettings keys — `gsettings list-recursively
-  org.gnome.Console` — so set them from the shell.
+  org.gnome.Console` — so set them from the shell. `setup.sh` sets the font that
+  way (`KGX_FONT`, `Monospace 12`); it leaves `font-scale`, the `Ctrl` + `+`/`-`
+  zoom, alone.
 
 ## Notes
 

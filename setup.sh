@@ -101,6 +101,18 @@ ln -sfn "$DIR/dotfiles.zsh-theme" ~/.oh-my-zsh/custom/themes/dotfiles.zsh-theme
 mkdir -p ~/.config/gtk-4.0
 ln -sfn "$DIR/gtk4.css" ~/.config/gtk-4.0/gtk.css
 
+# Console keeps its settings in gsettings rather than in a config file, so the
+# font is set here instead. use-system-font has to go first: custom-font is
+# ignored while it is true. font-scale, the Ctrl +/- zoom, is deliberately left
+# alone - it is a per-session thing, not a preference.
+KGX_FONT='Monospace 12'
+if command -v gsettings >/dev/null 2>&1 &&
+    gsettings writable org.gnome.Console custom-font >/dev/null 2>&1; then
+    echo "Setting the GNOME Console font to $KGX_FONT..."
+    gsettings set org.gnome.Console use-system-font false
+    gsettings set org.gnome.Console custom-font "$KGX_FONT"
+fi
+
 echo "Installing plugin managers..."
 if [ ! -d "$HOME/.vim/bundle/Vundle.vim" ]; then
     git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
