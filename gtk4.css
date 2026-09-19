@@ -1,0 +1,78 @@
+/*
+ * GTK 4 user stylesheet.
+ *
+ * Hide the window header bar of GNOME Console (kgx), which is all title and
+ * window buttons and no information a terminal multiplexer does not already
+ * show in its own status line.
+ *
+ * GTK has no `display: none`, so the bar cannot simply be switched off: it is
+ * collapsed instead. Every widget inside it is shrunk to nothing and made
+ * transparent, and the few pixels the shrunken children still ask for are
+ * absorbed by a negative margin on the bar itself, which leaves the top bar
+ * area exactly 0px tall.
+ *
+ * Scoping matters here, because `headerbar` on its own would match the header
+ * of every GTK 4 application on the system:
+ *   - `window.terminal-window` is the style class Console puts on its window;
+ *   - `toolbarview.main-box` is the one around the terminal itself, as opposed
+ *     to `toolbarview.overview` in the tab overview, whose header has to keep
+ *     working;
+ *   - the `*:not(popover)` chain walks only the bar's visible children. A
+ *     GtkPopover is a child widget of its menu button in GTK 4, so a plain
+ *     `headerbar *` would shrink the main menu along with the bar that opens
+ *     it.
+ *
+ * With the bar gone there is no title to drag and no window buttons. Move the
+ * window with `Super` + drag, maximise it with `Alt`+`F10`, minimise it with
+ * `Super`+`H`, and close it with `Ctrl+Shift+W`. `F11` still toggles
+ * fullscreen, and the main menu, invisible but still there, opens with `F10`.
+ */
+
+window.terminal-window toolbarview.main-box headerbar {
+  min-height: 0;
+  padding: 0;
+  margin-top: -4px;
+  border: none;
+  box-shadow: none;
+  background: none;
+}
+
+window.terminal-window toolbarview.main-box headerbar > *:not(popover),
+window.terminal-window toolbarview.main-box headerbar > *:not(popover) > *:not(popover),
+window.terminal-window toolbarview.main-box headerbar > *:not(popover) > *:not(popover) > *:not(popover),
+window.terminal-window toolbarview.main-box headerbar > *:not(popover) > *:not(popover) > *:not(popover) > *:not(popover),
+window.terminal-window toolbarview.main-box headerbar > *:not(popover) > *:not(popover) > *:not(popover) > *:not(popover) > *:not(popover),
+window.terminal-window toolbarview.main-box headerbar > *:not(popover) > *:not(popover) > *:not(popover) > *:not(popover) > *:not(popover) > *:not(popover),
+window.terminal-window toolbarview.main-box headerbar > *:not(popover) > *:not(popover) > *:not(popover) > *:not(popover) > *:not(popover) > *:not(popover) > *:not(popover),
+window.terminal-window toolbarview.main-box headerbar > *:not(popover) > *:not(popover) > *:not(popover) > *:not(popover) > *:not(popover) > *:not(popover) > *:not(popover) > *:not(popover) {
+  min-height: 0;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  font-size: 1px;
+  -gtk-icon-size: 1px;
+  opacity: 0;
+}
+
+/* The toolbar view wraps its top bars in a revealer that adds its own frame;
+   without this the hidden bar still leaves a 6px strip behind. */
+window.terminal-window toolbarview.main-box > revealer.top-bar {
+  min-height: 0;
+  border: none;
+  box-shadow: none;
+}
+
+window.terminal-window toolbarview.main-box > revealer.top-bar > windowhandle {
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+}
+
+/* Holds the header bar and the tab bar. Drop the spacing between them so the
+   tab bar, which stays visible with two tabs or more, sits flush at the top. */
+window.terminal-window toolbarview.main-box > revealer.top-bar > windowhandle > box {
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  border-spacing: 0;
+}

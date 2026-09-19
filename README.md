@@ -12,6 +12,7 @@ Personal dotfiles for a terminal-centric development setup: **tmux**, **Vim**, a
 | `zshrc`         | zsh configuration, loads oh-my-zsh |
 | `dotfiles.zsh-theme` | Custom oh-my-zsh prompt theme (user@host, time, path, git branch) |
 | `clipboard-copy` | Helper tmux pipes copied text to; picks a clipboard backend and drops empty input |
+| `gtk4.css`      | GTK 4 user stylesheet; hides the GNOME Console window header bar |
 | `setup.sh`      | Backs up existing dotfiles, installs zsh + oh-my-zsh + zsh-autosuggestions/zsh-syntax-highlighting + clipboard tools, symlinks these into `$HOME`, installs plugin managers |
 
 ## Install
@@ -24,7 +25,8 @@ cd ~/dotfiles
 
 `setup.sh` will:
 
-1. Move any existing `~/.tmux.conf` / `~/.vimrc` / `~/.zshrc` aside to `*_bak`.
+1. Move any existing `~/.tmux.conf` / `~/.vimrc` / `~/.zshrc` /
+   `~/.config/gtk-4.0/gtk.css` aside to `*_bak`.
 2. Install `zsh` via the detected package manager (`pacman`/`apt`/`dnf`/`brew`) if missing.
 3. Install `zsh-autosuggestions` and `zsh-syntax-highlighting` via the same package
    manager.
@@ -38,8 +40,9 @@ cd ~/dotfiles
 7. Install [oh-my-zsh](https://github.com/ohmyzsh/ohmyzsh) into `~/.oh-my-zsh` (unattended;
    keeps our `zshrc`, does not `chsh` or launch a shell).
 8. Symlink `tmux.conf` → `~/.tmux.conf`, `vimrc` → `~/.vimrc`, `zshrc` → `~/.zshrc`,
-   `clipboard-copy` → `~/.local/bin/clipboard-copy`, and `dotfiles.zsh-theme` →
-   `~/.oh-my-zsh/custom/themes/dotfiles.zsh-theme`.
+   `clipboard-copy` → `~/.local/bin/clipboard-copy`, `dotfiles.zsh-theme` →
+   `~/.oh-my-zsh/custom/themes/dotfiles.zsh-theme`, and `gtk4.css` →
+   `~/.config/gtk-4.0/gtk.css`.
 9. Clone [Vundle](https://github.com/VundleVim/Vundle.vim) into `~/.vim/bundle/Vundle.vim`.
 10. Clone [tpm](https://github.com/tmux-plugins/tpm) into `~/.tmux/plugins/tpm` and
     install the tmux plugins listed in `tmux.conf`, reloading a running tmux server.
@@ -55,6 +58,8 @@ cd ~/dotfiles
   already on disk, so a missing clone leaves them silently inactive.
 - **zsh:** log out and back in for the shell change to take effect. Put machine-local
   tweaks in `~/.zshrc.local` (sourced if present, not tracked here).
+- **GNOME Console:** quit every Console window and start a new one. GTK 4 reads
+  `~/.config/gtk-4.0/gtk.css` once, when the application starts.
 
 ## tmux highlights
 
@@ -144,6 +149,41 @@ cd ~/dotfiles
   repo. The theme shows a single `✗` either way.
 - `EDITOR`/`VISUAL` set to `vim`.
 - Sources `~/.zshrc.local` for machine-specific settings if it exists.
+
+## gtk4.css highlights
+
+- Hides the **GNOME Console** (`kgx`) window header bar, which costs 46px of
+  height and shows a title tmux already puts in its own status line. Console has
+  no setting for this, so the bar is hidden in CSS.
+- GTK has no `display: none`. The bar is *collapsed* instead: every widget inside
+  it is shrunk to zero and made transparent, and a negative top margin on the bar
+  swallows the handful of pixels the shrunken children still ask for. The top bar
+  area then measures exactly 0px, and 40px (the tab bar alone) once a second tab
+  is open.
+- The rules are scoped so they touch nothing else:
+
+  | Selector part | Why |
+  |---------------|-----|
+  | `window.terminal-window` | Console's own window class — bare `headerbar` would flatten the header of every GTK 4 app on the system |
+  | `toolbarview.main-box` | the bar around the terminal, not `toolbarview.overview` in the tab overview, whose header has to keep working |
+  | `> *:not(popover)` chains | a `GtkPopover` is a child *widget* of its menu button in GTK 4, so `headerbar *` would shrink the main menu along with the bar that opens it |
+
+- With no header bar there is no title to grab and no window buttons:
+
+  | Key | What it does |
+  |-----|--------------|
+  | `Alt+F10` | maximise / restore |
+  | `Super`+`H` | minimise |
+  | `Super` + drag | move the window |
+  | `Ctrl+Shift+W` | close (or `Ctrl+D` to end the shell) |
+  | `F10` | the main menu, invisible but still there |
+  | `F11` | fullscreen, where Console hides the bar by itself and reveals it on a mouse-to-top |
+
+- All of those are stock GNOME and Console bindings, so there is nothing to
+  configure. Console has no configurable keybindings of its own —
+  `org.gnome.Console` has no keys for them — so a terminal-specific shortcut is
+  not on offer: any binding added here would be a window-manager one, grabbing
+  the key desktop-wide and taking it away from every other application.
 
 ## Notes
 

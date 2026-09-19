@@ -8,6 +8,10 @@ for f in .tmux.conf .vimrc .zshrc; do
         mv "$HOME/$f" "$HOME/${f}_bak"
     fi
 done
+if [ -f "$HOME/.config/gtk-4.0/gtk.css" ] && [ ! -L "$HOME/.config/gtk-4.0/gtk.css" ]; then
+    echo "Existing gtk-4.0/gtk.css was found. Moving to gtk.css_bak ...!"
+    mv "$HOME/.config/gtk-4.0/gtk.css" "$HOME/.config/gtk-4.0/gtk.css_bak"
+fi
 
 echo "Installing zsh..."
 if ! command -v zsh >/dev/null 2>&1; then
@@ -92,6 +96,10 @@ mkdir -p ~/.local/bin
 ln -sfn "$DIR/clipboard-copy" ~/.local/bin/clipboard-copy
 mkdir -p ~/.oh-my-zsh/custom/themes
 ln -sfn "$DIR/dotfiles.zsh-theme" ~/.oh-my-zsh/custom/themes/dotfiles.zsh-theme
+# GTK 4 reads this stylesheet once, at application start: GNOME Console has to
+# be restarted before the header bar goes away.
+mkdir -p ~/.config/gtk-4.0
+ln -sfn "$DIR/gtk4.css" ~/.config/gtk-4.0/gtk.css
 
 echo "Installing plugin managers..."
 if [ ! -d "$HOME/.vim/bundle/Vundle.vim" ]; then
