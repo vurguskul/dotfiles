@@ -176,14 +176,15 @@ cd ~/dotfiles
   | `Super`+`H` | minimise |
   | `Super` + drag | move the window |
   | `Ctrl+Shift+W` | close (or `Ctrl+D` to end the shell) |
-  | `F10` | the main menu, invisible but still there |
-  | `F11` | fullscreen, where Console hides the bar by itself and reveals it on a mouse-to-top |
 
-- All of those are stock GNOME and Console bindings, so there is nothing to
-  configure. Console has no configurable keybindings of its own —
-  `org.gnome.Console` has no keys for them — so a terminal-specific shortcut is
-  not on offer: any binding added here would be a window-manager one, grabbing
-  the key desktop-wide and taking it away from every other application.
+  All of those are stock GNOME bindings, so there is nothing to configure.
+  Console has no configurable keybindings of its own — `org.gnome.Console` has
+  no keys for them — so a terminal-specific shortcut is not on offer: any
+  binding added here would be a window-manager one, grabbing the key
+  desktop-wide and taking it away from every other application.
+- The main menu goes with the bar, and the Preferences window with it. Console's
+  settings are `org.gnome.Console` gsettings keys — `gsettings list-recursively
+  org.gnome.Console` — so set them from the shell.
 
 ## Notes
 

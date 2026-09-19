@@ -24,8 +24,10 @@
  *
  * With the bar gone there is no title to drag and no window buttons. Move the
  * window with `Super` + drag, maximise it with `Alt`+`F10`, minimise it with
- * `Super`+`H`, and close it with `Ctrl+Shift+W`. `F11` still toggles
- * fullscreen, and the main menu, invisible but still there, opens with `F10`.
+ * `Super`+`H`, and close it with `Ctrl+Shift+W`.
+ *
+ * The main menu goes with the bar, and the Preferences window with it;
+ * Console's settings are `org.gnome.Console` gsettings keys.
  */
 
 window.terminal-window toolbarview.main-box headerbar {
