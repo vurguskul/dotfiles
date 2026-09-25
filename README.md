@@ -13,7 +13,7 @@ Personal dotfiles for a terminal-centric development setup: **tmux**, **Vim**, a
 | `dotfiles.zsh-theme` | Custom oh-my-zsh prompt theme (user@host, time, path, git branch) |
 | `clipboard-copy` | Helper tmux pipes copied text to; picks a clipboard backend and drops empty input |
 | `gtk4.css`      | GTK 4 user stylesheet; hides the GNOME Console window header bar |
-| `setup.sh`      | Backs up existing dotfiles, installs zsh + oh-my-zsh + zsh-autosuggestions/zsh-syntax-highlighting + clipboard tools, symlinks these into `$HOME`, installs plugin managers |
+| `setup.sh`      | Backs up existing dotfiles, installs zsh + oh-my-zsh + zsh-autosuggestions/zsh-syntax-highlighting + fzf/fd + clipboard tools, symlinks these into `$HOME`, installs plugin managers |
 
 ## Install
 
@@ -32,23 +32,27 @@ cd ~/dotfiles
    manager.
 4. Install `zsh-completions` where it is packaged (Arch, Homebrew). Optional — a
    platform without it is logged and skipped rather than failing the run.
-5. On Arch, install `pkgfile` and populate its file database (and enable
+5. Install `fzf` and `fd`, which the `fzf` oh-my-zsh plugin needs — without `fzf`
+   present, oh-my-zsh fails to start with "Cannot find fzf installation directory."
+   On Debian/Ubuntu, `fd-find` installs its binary as `fdfind`; it gets symlinked
+   to `~/.local/bin/fd` since that's the name zshrc and the fzf plugin look for.
+6. On Arch, install `pkgfile` and populate its file database (and enable
    `pkgfile-update.timer`), which the `command-not-found` plugin needs; without a
    populated cache that plugin loads and silently does nothing.
-6. Install `wl-clipboard` and `xclip` so tmux copies reach the system clipboard
+7. Install `wl-clipboard` and `xclip` so tmux copies reach the system clipboard
    (on macOS the built-in `pbcopy` is used instead).
-7. Install [oh-my-zsh](https://github.com/ohmyzsh/ohmyzsh) into `~/.oh-my-zsh` (unattended;
+8. Install [oh-my-zsh](https://github.com/ohmyzsh/ohmyzsh) into `~/.oh-my-zsh` (unattended;
    keeps our `zshrc`, does not `chsh` or launch a shell).
-8. Symlink `tmux.conf` → `~/.tmux.conf`, `vimrc` → `~/.vimrc`, `zshrc` → `~/.zshrc`,
+9. Symlink `tmux.conf` → `~/.tmux.conf`, `vimrc` → `~/.vimrc`, `zshrc` → `~/.zshrc`,
    `clipboard-copy` → `~/.local/bin/clipboard-copy`, `dotfiles.zsh-theme` →
    `~/.oh-my-zsh/custom/themes/dotfiles.zsh-theme`, and `gtk4.css` →
    `~/.config/gtk-4.0/gtk.css`.
-9. Set the GNOME Console font to `Monospace 12` (the `KGX_FONT` variable in
-   `setup.sh`). Console has no config file — its settings are gsettings keys.
-10. Clone [Vundle](https://github.com/VundleVim/Vundle.vim) into `~/.vim/bundle/Vundle.vim`.
-11. Clone [tpm](https://github.com/tmux-plugins/tpm) into `~/.tmux/plugins/tpm` and
+10. Set the GNOME Console font to `Monospace 12` (the `KGX_FONT` variable in
+    `setup.sh`). Console has no config file — its settings are gsettings keys.
+11. Clone [Vundle](https://github.com/VundleVim/Vundle.vim) into `~/.vim/bundle/Vundle.vim`.
+12. Clone [tpm](https://github.com/tmux-plugins/tpm) into `~/.tmux/plugins/tpm` and
     install the tmux plugins listed in `tmux.conf`, reloading a running tmux server.
-12. Set `zsh` as the default login shell (`chsh`) if it isn't already.
+13. Set `zsh` as the default login shell (`chsh`) if it isn't already.
 
 ### Finish setup
 

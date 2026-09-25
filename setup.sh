@@ -54,6 +54,29 @@ else
     echo "No zsh-completions package for this platform, skipping."
 fi
 
+# fzf backs the fzf plugin's Ctrl-R/Ctrl-T/Alt-C bindings - without it, oh-my-zsh
+# fails to start with "Cannot find fzf installation directory." fd is optional
+# (zshrc falls back to fzf's default find-based walk when it's missing), but
+# install it too so file/dir pickers honour .gitignore as documented.
+echo "Installing fzf and fd..."
+if command -v pacman >/dev/null 2>&1; then
+    sudo pacman -S --needed --noconfirm fzf fd
+elif command -v apt-get >/dev/null 2>&1; then
+    sudo apt-get update && sudo apt-get install -y fzf fd-find
+    # Debian/Ubuntu ship the binary as `fdfind` - the name `fd` already belongs
+    # to an unrelated package. Symlink it so zshrc's `command -v fd` finds it.
+    if command -v fdfind >/dev/null 2>&1 && ! command -v fd >/dev/null 2>&1; then
+        mkdir -p ~/.local/bin
+        ln -sfn "$(command -v fdfind)" ~/.local/bin/fd
+    fi
+elif command -v dnf >/dev/null 2>&1; then
+    sudo dnf install -y fzf fd-find
+elif command -v brew >/dev/null 2>&1; then
+    brew install fzf fd
+else
+    echo "No supported package manager found. Please install fzf and fd manually."
+fi
+
 # The command-not-found plugin needs pkgfile's file database on Arch; without a
 # populated cache the plugin loads and silently does nothing.
 if command -v pacman >/dev/null 2>&1; then
