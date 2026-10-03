@@ -89,6 +89,23 @@ if command -v pacman >/dev/null 2>&1; then
     sudo systemctl enable --now pkgfile-update.timer 2>/dev/null || true
 fi
 
+echo "Installing tmux..."
+if ! command -v tmux >/dev/null 2>&1; then
+    if command -v pacman >/dev/null 2>&1; then
+        sudo pacman -S --needed --noconfirm tmux
+    elif command -v apt-get >/dev/null 2>&1; then
+        sudo apt-get update && sudo apt-get install -y tmux
+    elif command -v dnf >/dev/null 2>&1; then
+        sudo dnf install -y tmux
+    elif command -v brew >/dev/null 2>&1; then
+        brew install tmux
+    else
+        echo "No supported package manager found. Please install tmux manually."
+    fi
+else
+    echo "tmux is already installed."
+fi
+
 echo "Installing clipboard tools (tmux copy -> system clipboard)..."
 if command -v pacman >/dev/null 2>&1; then
     sudo pacman -S --needed --noconfirm wl-clipboard xclip
