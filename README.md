@@ -13,6 +13,7 @@ Personal dotfiles for a terminal-centric development setup: **tmux**, **Vim**, a
 | `dotfiles.zsh-theme` | Custom oh-my-zsh prompt theme (user@host, time, path, git branch) |
 | `clipboard-copy` | Helper tmux pipes copied text to; picks a clipboard backend and drops empty input |
 | `gtk4.css`      | GTK 4 user stylesheet; hides the GNOME Console window header bar |
+| `ghostty.conf`  | Ghostty configuration; the Console setup (font, no header bar) plus OSC 52 clipboard access |
 | `setup.sh`      | Backs up existing dotfiles, installs zsh + oh-my-zsh + zsh-autosuggestions/zsh-syntax-highlighting + fzf/fd + clipboard tools, symlinks these into `$HOME`, installs plugin managers |
 
 ## Install
@@ -26,7 +27,7 @@ cd ~/dotfiles
 `setup.sh` will:
 
 1. Move any existing `~/.tmux.conf` / `~/.vimrc` / `~/.zshrc` /
-   `~/.config/gtk-4.0/gtk.css` aside to `*_bak`.
+   `~/.config/gtk-4.0/gtk.css` / `~/.config/ghostty/config.ghostty` aside to `*_bak`.
 2. Install `zsh` via the detected package manager (`pacman`/`apt`/`dnf`/`brew`) if missing.
 3. Install `zsh-autosuggestions` and `zsh-syntax-highlighting` via the same package
    manager.
@@ -45,8 +46,9 @@ cd ~/dotfiles
    keeps our `zshrc`, does not `chsh` or launch a shell).
 9. Symlink `tmux.conf` → `~/.tmux.conf`, `vimrc` → `~/.vimrc`, `zshrc` → `~/.zshrc`,
    `clipboard-copy` → `~/.local/bin/clipboard-copy`, `dotfiles.zsh-theme` →
-   `~/.oh-my-zsh/custom/themes/dotfiles.zsh-theme`, and `gtk4.css` →
-   `~/.config/gtk-4.0/gtk.css`.
+   `~/.oh-my-zsh/custom/themes/dotfiles.zsh-theme`, `gtk4.css` →
+   `~/.config/gtk-4.0/gtk.css`, and `ghostty.conf` →
+   `~/.config/ghostty/config.ghostty`.
 10. Set the GNOME Console font to `Monospace 12` (the `KGX_FONT` variable in
     `setup.sh`). Console has no config file — its settings are gsettings keys.
 11. Clone [Vundle](https://github.com/VundleVim/Vundle.vim) into `~/.vim/bundle/Vundle.vim`.
@@ -66,6 +68,9 @@ cd ~/dotfiles
   tweaks in `~/.zshrc.local` (sourced if present, not tracked here).
 - **GNOME Console:** quit every Console window and start a new one. GTK 4 reads
   `~/.config/gtk-4.0/gtk.css` once, when the application starts.
+- **Ghostty:** `setup.sh` does not install it (`pacman -S ghostty` on Arch).
+  Press `Ctrl+Shift+,` in a running Ghostty to reload the config; the header bar
+  setting only applies to windows opened afterwards.
 
 ## tmux highlights
 
@@ -193,6 +198,33 @@ cd ~/dotfiles
   org.gnome.Console` — so set them from the shell. `setup.sh` sets the font that
   way (`KGX_FONT`, `Monospace 12`); it leaves `font-scale`, the `Ctrl` + `+`/`-`
   zoom, alone.
+
+## ghostty.conf highlights
+
+- [Ghostty](https://ghostty.org) is a GTK 4 terminal that implements **OSC 52**,
+  which Console and every other VTE-based terminal lack. With it, tmux's
+  `set-clipboard on` and Vim over SSH reach the local clipboard with no
+  clipboard binary involved. Ghostty's terminfo (`xterm-ghostty`) advertises the
+  `Ms` capability, so tmux picks this up without any `terminal-features` entry.
+- Writing the clipboard is allowed; reading it asks first (`clipboard-read =
+  ask`), since a silent read would hand the clipboard to anything that prints
+  to the terminal, remote hosts included.
+- **SSH works on hosts without Ghostty's terminfo.** Out of the box, `ssh` from
+  Ghostty fails with `missing or unsuitable terminal: xterm-ghostty`, since
+  remote hosts don't know that `TERM`. `shell-integration-features =
+  ssh-terminfo,ssh-env` makes Ghostty's zsh integration wrap `ssh`: it installs
+  the terminfo entry on each new host (`infocmp` locally, `tic` remotely),
+  remembers where it worked (`ghostty +ssh-cache` lists and clears that), and
+  falls back to `TERM=xterm-256color` where it can't. Shells inside tmux aren't
+  affected, since tmux sets `TERM` to `screen-256color`.
+- Same font as Console: `Monospace`, 12pt.
+- **No header bar**, like `gtk4.css` gives Console, but as a plain setting:
+  `gtk-titlebar = false`. GNOME draws no server-side title bar on Wayland, so
+  the window ends up with none; the tab bar still appears from the second tab
+  on. `window-decoration = none` would drop the bar too, but also the window's
+  shadow and rounded corners.
+- The same stock GNOME keys move, maximise and minimise the window (`Super` +
+  drag, `Alt+F10`, `Super`+`H`); `Ctrl+Shift+W` closes the tab.
 
 ## Notes
 

@@ -12,6 +12,10 @@ if [ -f "$HOME/.config/gtk-4.0/gtk.css" ] && [ ! -L "$HOME/.config/gtk-4.0/gtk.c
     echo "Existing gtk-4.0/gtk.css was found. Moving to gtk.css_bak ...!"
     mv "$HOME/.config/gtk-4.0/gtk.css" "$HOME/.config/gtk-4.0/gtk.css_bak"
 fi
+if [ -f "$HOME/.config/ghostty/config.ghostty" ] && [ ! -L "$HOME/.config/ghostty/config.ghostty" ]; then
+    echo "Existing ghostty/config.ghostty was found. Moving to config.ghostty_bak ...!"
+    mv "$HOME/.config/ghostty/config.ghostty" "$HOME/.config/ghostty/config.ghostty_bak"
+fi
 
 echo "Installing zsh..."
 if ! command -v zsh >/dev/null 2>&1; then
@@ -140,6 +144,10 @@ ln -sfn "$DIR/dotfiles.zsh-theme" ~/.oh-my-zsh/custom/themes/dotfiles.zsh-theme
 # be restarted before the header bar goes away.
 mkdir -p ~/.config/gtk-4.0
 ln -sfn "$DIR/gtk4.css" ~/.config/gtk-4.0/gtk.css
+# config.ghostty is the name Ghostty 1.2+ looks for first. Press Ctrl+Shift+,
+# in a running Ghostty to pick up changes.
+mkdir -p ~/.config/ghostty
+ln -sfn "$DIR/ghostty.conf" ~/.config/ghostty/config.ghostty
 
 # Console keeps its settings in gsettings rather than in a config file, so the
 # font is set here instead. use-system-font has to go first: custom-font is
