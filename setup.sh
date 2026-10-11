@@ -125,8 +125,18 @@ fi
 
 # Ghostty is packaged on Arch and as a Homebrew cask. Debian/Ubuntu and Fedora
 # have it only in third-party repos, so use the snap there rather than add one.
+#
+# It is a GTK app, so skip it on headless machines. Every desktop environment or
+# window manager a display manager can start installs a session file, so their
+# absence means no desktop. $DISPLAY / $WAYLAND_DISPLAY would not do: they are
+# unset whenever setup.sh runs over SSH or from a text console, desktop or not.
+# Not `ls dir1/*.desktop dir2/*.desktop`: that fails as soon as one of the two
+# directories is missing, which on a Wayland-only desktop xsessions/ usually is.
 echo "Installing Ghostty..."
-if ! command -v ghostty >/dev/null 2>&1; then
+if [ "$(uname)" != Darwin ] &&
+    ! find /usr/share/wayland-sessions /usr/share/xsessions -name '*.desktop' 2>/dev/null | grep -q .; then
+    echo "No desktop session found, skipping Ghostty."
+elif ! command -v ghostty >/dev/null 2>&1; then
     if command -v pacman >/dev/null 2>&1; then
         sudo pacman -S --needed --noconfirm ghostty
     elif command -v brew >/dev/null 2>&1; then

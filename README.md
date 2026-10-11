@@ -45,7 +45,9 @@ cd ~/dotfiles
    (on macOS the built-in `pbcopy` is used instead).
 8. Install [Ghostty](https://ghostty.org) if missing: `pacman` on Arch, the
    Homebrew cask on macOS, the snap elsewhere (Debian/Ubuntu and Fedora only
-   have it in third-party repos).
+   have it in third-party repos). Skipped on headless machines, i.e. Linux with
+   no desktop session file in `/usr/share/wayland-sessions` or
+   `/usr/share/xsessions`; its config and themes are still linked.
 9. Install [oh-my-zsh](https://github.com/ohmyzsh/ohmyzsh) into `~/.oh-my-zsh` (unattended;
    keeps our `zshrc`, does not `chsh` or launch a shell).
 10. Symlink `tmux.conf` → `~/.tmux.conf`, `vimrc` → `~/.vimrc`, `zshrc` → `~/.zshrc`,
