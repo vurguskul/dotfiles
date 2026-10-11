@@ -14,7 +14,7 @@ Personal dotfiles for a terminal-centric development setup: **tmux**, **Vim**, a
 | `clipboard-copy` | Helper tmux pipes copied text to; picks a clipboard backend and drops empty input |
 | `gtk4.css`      | GTK 4 user stylesheet; hides the GNOME Console window header bar |
 | `ghostty.conf`  | Ghostty configuration; the Console setup (font, no header bar) plus OSC 52 clipboard access |
-| `setup.sh`      | Backs up existing dotfiles, installs zsh + oh-my-zsh + zsh-autosuggestions/zsh-syntax-highlighting + fzf/fd + clipboard tools, symlinks these into `$HOME`, installs plugin managers |
+| `setup.sh`      | Backs up existing dotfiles, installs zsh + oh-my-zsh + zsh-autosuggestions/zsh-syntax-highlighting + fzf/fd + clipboard tools + Ghostty, symlinks these into `$HOME`, installs plugin managers |
 
 ## Install
 
@@ -42,19 +42,22 @@ cd ~/dotfiles
    populated cache that plugin loads and silently does nothing.
 7. Install `wl-clipboard` and `xclip` so tmux copies reach the system clipboard
    (on macOS the built-in `pbcopy` is used instead).
-8. Install [oh-my-zsh](https://github.com/ohmyzsh/ohmyzsh) into `~/.oh-my-zsh` (unattended;
+8. Install [Ghostty](https://ghostty.org) if missing: `pacman` on Arch, the
+   Homebrew cask on macOS, the snap elsewhere (Debian/Ubuntu and Fedora only
+   have it in third-party repos).
+9. Install [oh-my-zsh](https://github.com/ohmyzsh/ohmyzsh) into `~/.oh-my-zsh` (unattended;
    keeps our `zshrc`, does not `chsh` or launch a shell).
-9. Symlink `tmux.conf` → `~/.tmux.conf`, `vimrc` → `~/.vimrc`, `zshrc` → `~/.zshrc`,
-   `clipboard-copy` → `~/.local/bin/clipboard-copy`, `dotfiles.zsh-theme` →
-   `~/.oh-my-zsh/custom/themes/dotfiles.zsh-theme`, `gtk4.css` →
-   `~/.config/gtk-4.0/gtk.css`, and `ghostty.conf` →
-   `~/.config/ghostty/config.ghostty`.
-10. Set the GNOME Console font to `Monospace 12` (the `KGX_FONT` variable in
+10. Symlink `tmux.conf` → `~/.tmux.conf`, `vimrc` → `~/.vimrc`, `zshrc` → `~/.zshrc`,
+    `clipboard-copy` → `~/.local/bin/clipboard-copy`, `dotfiles.zsh-theme` →
+    `~/.oh-my-zsh/custom/themes/dotfiles.zsh-theme`, `gtk4.css` →
+    `~/.config/gtk-4.0/gtk.css`, and `ghostty.conf` →
+    `~/.config/ghostty/config.ghostty`.
+11. Set the GNOME Console font to `Monospace 12` (the `KGX_FONT` variable in
     `setup.sh`). Console has no config file — its settings are gsettings keys.
-11. Clone [Vundle](https://github.com/VundleVim/Vundle.vim) into `~/.vim/bundle/Vundle.vim`.
-12. Clone [tpm](https://github.com/tmux-plugins/tpm) into `~/.tmux/plugins/tpm` and
+12. Clone [Vundle](https://github.com/VundleVim/Vundle.vim) into `~/.vim/bundle/Vundle.vim`.
+13. Clone [tpm](https://github.com/tmux-plugins/tpm) into `~/.tmux/plugins/tpm` and
     install the tmux plugins listed in `tmux.conf`, reloading a running tmux server.
-13. Set `zsh` as the default login shell (`chsh`) if it isn't already.
+14. Set `zsh` as the default login shell (`chsh`) if it isn't already.
 
 ### Finish setup
 
@@ -68,9 +71,8 @@ cd ~/dotfiles
   tweaks in `~/.zshrc.local` (sourced if present, not tracked here).
 - **GNOME Console:** quit every Console window and start a new one. GTK 4 reads
   `~/.config/gtk-4.0/gtk.css` once, when the application starts.
-- **Ghostty:** `setup.sh` does not install it (`pacman -S ghostty` on Arch).
-  Press `Ctrl+Shift+,` in a running Ghostty to reload the config; the header bar
-  setting only applies to windows opened afterwards.
+- **Ghostty:** press `Ctrl+Shift+,` in a running Ghostty to reload the config;
+  the header bar setting only applies to windows opened afterwards.
 
 ## tmux highlights
 

@@ -123,6 +123,23 @@ else
     echo "No supported package manager found. Please install wl-clipboard or xclip manually."
 fi
 
+# Ghostty is packaged on Arch and as a Homebrew cask. Debian/Ubuntu and Fedora
+# have it only in third-party repos, so use the snap there rather than add one.
+echo "Installing Ghostty..."
+if ! command -v ghostty >/dev/null 2>&1; then
+    if command -v pacman >/dev/null 2>&1; then
+        sudo pacman -S --needed --noconfirm ghostty
+    elif command -v brew >/dev/null 2>&1; then
+        brew install --cask ghostty
+    elif command -v snap >/dev/null 2>&1; then
+        sudo snap install ghostty --classic
+    else
+        echo "No supported package manager found. See https://ghostty.org/docs/install."
+    fi
+else
+    echo "Ghostty is already installed."
+fi
+
 echo "Installing oh-my-zsh..."
 if [ ! -d $HOME/.oh-my-zsh ]; then
     RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
