@@ -165,6 +165,10 @@ ln -sfn "$DIR/gtk4.css" ~/.config/gtk-4.0/gtk.css
 # in a running Ghostty to pick up changes.
 mkdir -p ~/.config/ghostty
 ln -sfn "$DIR/ghostty.conf" ~/.config/ghostty/config.ghostty
+mkdir -p ~/.config/ghostty/themes
+for theme in "$DIR"/ghostty-themes/*; do
+    ln -sfn "$theme" ~/.config/ghostty/themes/"$(basename "$theme")"
+done
 
 # Console keeps its settings in gsettings rather than in a config file, so the
 # font is set here instead. use-system-font has to go first: custom-font is

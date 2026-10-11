@@ -13,7 +13,8 @@ Personal dotfiles for a terminal-centric development setup: **tmux**, **Vim**, a
 | `dotfiles.zsh-theme` | Custom oh-my-zsh prompt theme (user@host, time, path, git branch) |
 | `clipboard-copy` | Helper tmux pipes copied text to; picks a clipboard backend and drops empty input |
 | `gtk4.css`      | GTK 4 user stylesheet; hides the GNOME Console window header bar |
-| `ghostty.conf`  | Ghostty configuration; the Console setup (font, no header bar) plus OSC 52 clipboard access |
+| `ghostty.conf`  | Ghostty configuration; the Console setup (font, colours, no header bar) plus OSC 52 clipboard access |
+| `ghostty-themes/` | Ghostty themes with GNOME Console's default colours, a day and a night one |
 | `setup.sh`      | Backs up existing dotfiles, installs zsh + oh-my-zsh + zsh-autosuggestions/zsh-syntax-highlighting + fzf/fd + clipboard tools + Ghostty, symlinks these into `$HOME`, installs plugin managers |
 
 ## Install
@@ -50,8 +51,9 @@ cd ~/dotfiles
 10. Symlink `tmux.conf` → `~/.tmux.conf`, `vimrc` → `~/.vimrc`, `zshrc` → `~/.zshrc`,
     `clipboard-copy` → `~/.local/bin/clipboard-copy`, `dotfiles.zsh-theme` →
     `~/.oh-my-zsh/custom/themes/dotfiles.zsh-theme`, `gtk4.css` →
-    `~/.config/gtk-4.0/gtk.css`, and `ghostty.conf` →
-    `~/.config/ghostty/config.ghostty`.
+    `~/.config/gtk-4.0/gtk.css`, `ghostty.conf` →
+    `~/.config/ghostty/config.ghostty`, and each file in `ghostty-themes/` into
+    `~/.config/ghostty/themes/`.
 11. Set the GNOME Console font to `Monospace 12` (the `KGX_FONT` variable in
     `setup.sh`). Console has no config file — its settings are gsettings keys.
 12. Clone [Vundle](https://github.com/VundleVim/Vundle.vim) into `~/.vim/bundle/Vundle.vim`.
@@ -220,6 +222,13 @@ cd ~/dotfiles
   falls back to `TERM=xterm-256color` where it can't. Shells inside tmux aren't
   affected, since tmux sets `TERM` to `screen-256color`.
 - Same font as Console: `Monospace`, 12pt.
+- **Same colours as Console.** `ghostty-themes/console-day` and `console-night`
+  carry the palette of Console's default livery, copied from
+  `standard_livery()` in its `src/kgx-livery-manager.c`: 16 GNOME-palette
+  colours shared by both modes, black on white by day and white on `#1c1c1f` by
+  night. `theme = light:console-day,dark:console-night` picks one from the GNOME
+  style setting, the way Console's `theme = auto` does. Cursor and selection
+  are left unset, as in Console, so both invert the cell.
 - **No header bar**, like `gtk4.css` gives Console, but as a plain setting:
   `gtk-titlebar = false`. GNOME draws no server-side title bar on Wayland, so
   the window ends up with none; the tab bar still appears from the second tab
