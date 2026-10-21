@@ -1,0 +1,64 @@
+#!/bin/sh
+# Lets tmux-resurrect bring every claude pane back to its own conversation.
+#
+# On its own resurrect can only replay the command line it saw in `ps`, and a
+# fresh claude has no session ID there, so the best it could do was `claude
+# --continue`: the latest conversation of the pane's directory, the same one
+# for every claude pane in that directory. Instead:
+#
+#   record      Claude Code SessionStart hook. Stores the session ID on the
+#               pane claude runs in, as the pane option @claude-session. The
+#               hook fires on startup, --resume, /clear and compaction, so the
+#               option follows whatever conversation the pane is showing, and
+#               being a pane option it follows the pane across moves and
+#               window renumbering.
+#   save FILE   resurrect post-save-layout hook. Rewrites the saved command of
+#               every claude pane in FILE to `claude --resume <id>`, or to
+#               `claude --continue` for a claude that started before the hook
+#               existed. tmux.conf replays that with "claude->claude *".
+
+case "$1" in
+record)
+    [ -n "$TMUX_PANE" ] || exit 0
+    id=$(sed -n 's/.*"session_id" *: *"\([^"]*\)".*/\1/p')
+    [ -n "$id" ] || exit 0
+
+    # Only a claude started from the pane's shell owns the pane. A `claude -p`
+    # run by a tool inside another claude inherits TMUX_PANE too, and must not
+    # take the pane over from it. CLAUDE_PID is the claude running this hook.
+    claude_pid=${CLAUDE_PID:-$PPID}
+    pane_pid=$(tmux display -p -t "$TMUX_PANE" '#{pane_pid}' 2>/dev/null) || exit 0
+    parent=$(ps -o ppid= -p "$claude_pid" | tr -d ' ')
+    [ "$claude_pid" = "$pane_pid" ] || [ "$parent" = "$pane_pid" ] || exit 0
+
+    # Stdout of a SessionStart hook ends up in claude's context: keep it empty.
+    tmux set -p -t "$TMUX_PANE" @claude-session "$id" >/dev/null 2>&1
+    ;;
+save)
+    state=$2
+    [ -f "$state" ] || exit 0
+
+    # Pane lines are tab separated: "pane", session, window, ..., pane index
+    # in field 6, ":" + the full command in field 11. The option is read for
+    # every pane, but only panes still running claude are touched: a pane
+    # keeps @claude-session after claude exits.
+    tmux list-panes -a -F '#{session_name}	#{window_index}	#{pane_index}	#{@claude-session}' |
+        awk -F '\t' -v OFS='\t' '
+            NR == FNR { if ($4 != "") id[$1 FS $2 FS $3] = $4; next }
+            $1 == "pane" {
+                cmd = substr($11, 2)
+                sub(/ .*/, "", cmd)
+                sub(/.*\//, "", cmd)
+                if (cmd == "claude") {
+                    key = $2 FS $3 FS $6
+                    $11 = ":claude " (key in id ? "--resume " id[key] : "--continue")
+                }
+            }
+            { print }
+        ' - "$state" >"$state.tmp" && mv "$state.tmp" "$state"
+    ;;
+*)
+    echo "usage: $0 record | save FILE" >&2
+    exit 2
+    ;;
+esac

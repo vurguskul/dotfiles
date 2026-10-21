@@ -12,6 +12,7 @@ Personal dotfiles for a terminal-centric development setup: **tmux**, **Vim**, a
 | `zshrc`         | zsh configuration, loads oh-my-zsh |
 | `dotfiles.zsh-theme` | Custom oh-my-zsh prompt theme (user@host, time, path, git branch) |
 | `clipboard-copy` | Helper tmux pipes copied text to; picks a clipboard backend and drops empty input |
+| `tmux-claude-session` | Claude Code hook + tmux-resurrect hook that bring each claude pane back to its own conversation |
 | `gtk4.css`      | GTK 4 user stylesheet; hides the GNOME Console window header bar |
 | `ghostty.conf`  | Ghostty configuration; the Console setup (font, colours, no header bar) plus OSC 52 clipboard access |
 | `ghostty-themes/` | Ghostty themes with GNOME Console's default colours, a day and a night one |
@@ -51,17 +52,21 @@ cd ~/dotfiles
 9. Install [oh-my-zsh](https://github.com/ohmyzsh/ohmyzsh) into `~/.oh-my-zsh` (unattended;
    keeps our `zshrc`, does not `chsh` or launch a shell).
 10. Symlink `tmux.conf` → `~/.tmux.conf`, `vimrc` → `~/.vimrc`, `zshrc` → `~/.zshrc`,
-    `clipboard-copy` → `~/.local/bin/clipboard-copy`, `dotfiles.zsh-theme` →
+    `clipboard-copy` → `~/.local/bin/clipboard-copy`, `tmux-claude-session` →
+    `~/.local/bin/tmux-claude-session`, `dotfiles.zsh-theme` →
     `~/.oh-my-zsh/custom/themes/dotfiles.zsh-theme`, `gtk4.css` →
     `~/.config/gtk-4.0/gtk.css`, `ghostty.conf` →
     `~/.config/ghostty/config.ghostty`, and each file in `ghostty-themes/` into
     `~/.config/ghostty/themes/`.
 11. Set the GNOME Console font to `Monospace 12` (the `KGX_FONT` variable in
     `setup.sh`). Console has no config file — its settings are gsettings keys.
-12. Clone [Vundle](https://github.com/VundleVim/Vundle.vim) into `~/.vim/bundle/Vundle.vim`.
-13. Clone [tpm](https://github.com/tmux-plugins/tpm) into `~/.tmux/plugins/tpm` and
+12. If `claude` is installed, merge a `SessionStart` hook running
+    `tmux-claude-session record` into `~/.claude/settings.json` (needs `jq`;
+    the rest of the file is left as is).
+13. Clone [Vundle](https://github.com/VundleVim/Vundle.vim) into `~/.vim/bundle/Vundle.vim`.
+14. Clone [tpm](https://github.com/tmux-plugins/tpm) into `~/.tmux/plugins/tpm` and
     install the tmux plugins listed in `tmux.conf`, reloading a running tmux server.
-14. Set `zsh` as the default login shell (`chsh`) if it isn't already.
+15. Set `zsh` as the default login shell (`chsh`) if it isn't already.
 
 ### Finish setup
 
@@ -104,6 +109,11 @@ cd ~/dotfiles
 - `prefix + r` reloads the config.
 - Plugins: `tmux-sensible`, `tmux-resurrect`, `tmux-continuum` (auto restore of
   sessions, panes, and shell history), `tmux-colors-solarized` (dark).
+- Restore brings back `btop` and `claude` too, each claude pane with its own
+  conversation (`claude --resume <id>`). Claude Code's `SessionStart` hook stores
+  the session ID on the pane (`@claude-session`), and resurrect's post-save hook
+  writes it into the saved command. A claude started before the hook was
+  installed comes back with `claude --continue` instead.
 
 ## vimrc highlights
 

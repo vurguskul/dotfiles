@@ -165,6 +165,7 @@ ln -sfn "$DIR/vimrc" ~/.vimrc
 ln -sfn "$DIR/zshrc" ~/.zshrc
 mkdir -p ~/.local/bin
 ln -sfn "$DIR/clipboard-copy" ~/.local/bin/clipboard-copy
+ln -sfn "$DIR/tmux-claude-session" ~/.local/bin/tmux-claude-session
 mkdir -p ~/.oh-my-zsh/custom/themes
 ln -sfn "$DIR/dotfiles.zsh-theme" ~/.oh-my-zsh/custom/themes/dotfiles.zsh-theme
 # GTK 4 reads this stylesheet once, at application start: GNOME Console has to
@@ -190,6 +191,27 @@ if command -v gsettings >/dev/null 2>&1 &&
     echo "Setting the GNOME Console font to $KGX_FONT..."
     gsettings set org.gnome.Console use-system-font false
     gsettings set org.gnome.Console custom-font "$KGX_FONT"
+fi
+
+# tmux-resurrect resumes each claude pane's own conversation only if claude
+# tells the pane which one that is (see tmux-claude-session). settings.json also
+# holds settings changed from inside claude, so merge the hook in rather than
+# link a file over it, and leave it alone if the hook is already there.
+CLAUDE_SETTINGS=~/.claude/settings.json
+CLAUDE_HOOK="$HOME/.local/bin/tmux-claude-session record"
+if command -v claude >/dev/null 2>&1; then
+    if command -v jq >/dev/null 2>&1; then
+        echo "Installing the Claude Code hook for tmux-resurrect..."
+        mkdir -p ~/.claude
+        [ -f "$CLAUDE_SETTINGS" ] || echo '{}' >"$CLAUDE_SETTINGS"
+        tmp=$(mktemp "$CLAUDE_SETTINGS.XXXXXX")
+        jq --arg cmd "$CLAUDE_HOOK" '
+            if any(.hooks.SessionStart[]?.hooks[]?; .command == $cmd) then .
+            else .hooks.SessionStart += [{hooks: [{type: "command", command: $cmd}]}]
+            end' "$CLAUDE_SETTINGS" >"$tmp" && mv "$tmp" "$CLAUDE_SETTINGS" || rm -f "$tmp"
+    else
+        echo "jq not found: add a SessionStart hook running '$CLAUDE_HOOK' to $CLAUDE_SETTINGS by hand."
+    fi
 fi
 
 echo "Installing plugin managers..."
