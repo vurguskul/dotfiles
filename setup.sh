@@ -166,6 +166,7 @@ ln -sfn "$DIR/zshrc" ~/.zshrc
 mkdir -p ~/.local/bin
 ln -sfn "$DIR/clipboard-copy" ~/.local/bin/clipboard-copy
 ln -sfn "$DIR/tmux-claude-session" ~/.local/bin/tmux-claude-session
+ln -sfn "$DIR/tmux-resurrect-restore" ~/.local/bin/tmux-resurrect-restore
 mkdir -p ~/.oh-my-zsh/custom/themes
 ln -sfn "$DIR/dotfiles.zsh-theme" ~/.oh-my-zsh/custom/themes/dotfiles.zsh-theme
 # GTK 4 reads this stylesheet once, at application start: GNOME Console has to

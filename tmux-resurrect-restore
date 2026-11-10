@@ -1,0 +1,27 @@
+#!/bin/sh
+# Runs tmux-resurrect's restore one at a time per tmux server.
+#
+# restore.sh decides what to create by looking at which panes already exist,
+# so it is safe to run again after a restore has finished but not while one is
+# running: the second run sees "window 11 exists, pane 1 doesn't" in the gap
+# between the first run's own checks and splits, and splits the window again.
+# Each window it catches up with then gets an extra pane holding a copy of its
+# last pane's saved contents, the saved layout no longer fits the pane count
+# and select-layout refuses it, and the window is left as resurrect built it -
+# every pane stacked top to bottom, all but the last one row high.
+#
+# Two runs overlap whenever restore is asked for twice in the first seconds of
+# a server: continuum restores whenever its plugin file is sourced within 10
+# seconds of the server starting, so a config reload (prefix r, prefix R,
+# setup.sh) in that window starts a second one, and so does prefix C-r. tmux.conf
+# points both continuum and prefix C-r here instead of at restore.sh.
+#
+# The lock is a tmux wait-for channel: it lives in the server and goes away
+# with it, so a run killed before unlocking can't block the next server's.
+
+restore=${TMUX_RESURRECT_RESTORE:-$HOME/.tmux/plugins/tmux-resurrect/scripts/restore.sh}
+
+tmux wait-for -L resurrect-restore || exit 1
+trap 'tmux wait-for -U resurrect-restore' EXIT
+trap 'exit 1' HUP INT TERM
+"$restore"

@@ -13,6 +13,7 @@ Personal dotfiles for a terminal-centric development setup: **tmux**, **Vim**, a
 | `dotfiles.zsh-theme` | Custom oh-my-zsh prompt theme (user@host, time, path, git branch) |
 | `clipboard-copy` | Helper tmux pipes copied text to; picks a clipboard backend and drops empty input |
 | `tmux-claude-session` | Claude Code hook + tmux-resurrect hook that bring each claude pane back to its own conversation |
+| `tmux-resurrect-restore` | Runs tmux-resurrect's restore one at a time, so two overlapping restores can't split windows twice |
 | `gtk4.css`      | GTK 4 user stylesheet; hides the GNOME Console window header bar |
 | `ghostty.conf`  | Ghostty configuration; the Console setup (font, colours, no header bar) plus OSC 52 clipboard access |
 | `ghostty-themes/` | Ghostty themes with GNOME Console's default colours, a day and a night one |
@@ -53,7 +54,8 @@ cd ~/dotfiles
    keeps our `zshrc`, does not `chsh` or launch a shell).
 10. Symlink `tmux.conf` → `~/.tmux.conf`, `vimrc` → `~/.vimrc`, `zshrc` → `~/.zshrc`,
     `clipboard-copy` → `~/.local/bin/clipboard-copy`, `tmux-claude-session` →
-    `~/.local/bin/tmux-claude-session`, `dotfiles.zsh-theme` →
+    `~/.local/bin/tmux-claude-session`, `tmux-resurrect-restore` →
+    `~/.local/bin/tmux-resurrect-restore`, `dotfiles.zsh-theme` →
     `~/.oh-my-zsh/custom/themes/dotfiles.zsh-theme`, `gtk4.css` →
     `~/.config/gtk-4.0/gtk.css`, `ghostty.conf` →
     `~/.config/ghostty/config.ghostty`, and each file in `ghostty-themes/` into
@@ -114,6 +116,12 @@ cd ~/dotfiles
   the session ID on the pane (`@claude-session`), and resurrect's post-save hook
   writes it into the saved command. A claude started before the hook was
   installed comes back with `claude --continue` instead.
+- Restores (continuum's automatic one and `prefix + C-r`) run through
+  `tmux-resurrect-restore`, which holds a tmux `wait-for` lock: a second restore
+  started while one is running (a config reload in the server's first 10
+  seconds is enough) would otherwise split every window it catches up with once
+  more, and those windows come back stacked vertically instead of in their
+  saved layout.
 
 ## vimrc highlights
 
